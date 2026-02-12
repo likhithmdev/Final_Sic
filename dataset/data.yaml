@@ -1,0 +1,12 @@
+path: ../dataset
+train: train/images
+val: val/images
+test: test/images
+
+nc: 3
+names: ['dry', 'wet', 'electronic']
+
+# Download dataset:
+# Place images in train/images, val/images, test/images
+# Place labels in train/labels, val/labels, test/labels
+# Labels format: YOLO format (class x_center y_center width height)

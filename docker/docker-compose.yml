@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  server:
+    build:
+      context: ../server
+      dockerfile: ../docker/Dockerfile.server
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - MQTT_BROKER=mqtt-broker
+      - MQTT_PORT=1883
+      - NODE_ENV=production
+    depends_on:
+      - mqtt-broker
+    networks:
+      - smartbin-network
+
+  client:
+    build:
+      context: ../client
+      dockerfile: ../docker/Dockerfile.client
+    ports:
+      - "5173:80"
+    depends_on:
+      - server
+    networks:
+      - smartbin-network
+
+  mqtt-broker:
+    image: eclipse-mosquitto:2.0
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - mosquitto-data:/mosquitto/data
+      - mosquitto-logs:/mosquitto/log
+    networks:
+      - smartbin-network
+
+volumes:
+  mosquitto-data:
+  mosquitto-logs:
+
+networks:
+  smartbin-network:
+    driver: bridge
