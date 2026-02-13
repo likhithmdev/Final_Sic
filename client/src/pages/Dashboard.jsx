@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useSocket } from '../context/SocketContext';
-import LiveFeed from '../components/LiveFeed';
 import DetectionCard from '../components/DetectionCard';
 import BinStatus from '../components/BinStatus';
 import ProcessingChamber from '../components/ProcessingChamber';
@@ -151,10 +150,9 @@ const Dashboard = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left Column */}
-          <div className="lg:col-span-2 space-y-6">
-            <LiveFeed detection={detection} />
+          <div className="space-y-6">
             <DetectionCard detection={detection} />
             <StatsPanel detection={detection} />
           </div>

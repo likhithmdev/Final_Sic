@@ -7,6 +7,7 @@ const cookieParser = require('cookie-parser');
 
 const mqttService = require('./services/mqttService');
 const socketService = require('./services/socketService');
+const telegramService = require('./services/telegramService');
 const detectionController = require('./controllers/detectionController');
 const rewardsController = require('./controllers/rewardsController');
 const activeUserStore = require('./services/activeUserStore');
@@ -143,6 +144,9 @@ server.listen(PORT, () => {
   console.log(`MQTT broker: ${mqttConfig.getBrokerUrl()}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log('========================================\n');
+
+  // Send startup notification to Telegram
+  telegramService.sendStartupNotification();
 });
 
 // Graceful shutdown
