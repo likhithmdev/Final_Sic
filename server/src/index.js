@@ -62,21 +62,49 @@ mqttService.onMessage(mqttConfig.topics.detection, async (data) => {
   // Emit to connected clients
   socketService.emitDetectionUpdate(data);
   
-  // Auto-credit points when plastic or e-waste is segregated
+  // Auto-credit points when dry or e-waste is segregated
   const activeUserId = activeUserStore.getActiveUser();
   if (activeUserId) {
-    const wasteType = data.destination || data.objects?.[0]?.class || data.label;
-    const isReject = (data.destination === 'reject' || (data.confidence !== undefined && data.confidence < 0.65));
-    const isEligible = wasteType === 'dry' || wasteType === 'electronic';
-    if (isEligible && !isReject) {
+    // Extract waste type from detection data
+    const wasteType = data.destination || data.objects?.[0]?.class;
+    const confidence = data.confidence || data.objects?.[0]?.confidence;
+    
+    // Check if it's a valid waste type (not reject, none, or multiplewaste)
+    const isValidWaste = wasteType === 'dry' || wasteType === 'electronic';
+    const isReject = data.destination === 'reject' || data.destination === 'none';
+    const isHighConfidence = confidence === undefined || confidence >= 0.65;
+    
+    // Credit only for dry and electronic waste with sufficient confidence
+    if (isValidWaste && isHighConfidence && !isReject) {
       try {
         const updated = await rewardsController.creditFromBin(activeUserId, wasteType);
         if (updated) {
-          console.log(`Credited user ${activeUserId}: ${wasteType} (+${wasteType === 'dry' ? 5 : 10} pts)`);
+          const points = wasteType === 'dry' ? 5 : 10;
+          console.log(`Credited user ${activeUserId}: ${wasteType} (+${points} pts)`);
           socketService.emitCreditUpdate({ user_id: activeUserId, waste_type: wasteType, credits: updated.credits });
         }
       } catch (err) {
         console.error('Auto-credit from bin failed:', err);
+      }
+    } else if (data.destination === 'multiplewaste') {
+      // For multiple waste items, credit for each valid item
+      if (data.objects && Array.isArray(data.objects)) {
+        for (const obj of data.objects) {
+          const objClass = obj.class || obj.destination;
+          const objConf = obj.confidence || 0;
+          if ((objClass === 'dry' || objClass === 'electronic') && objConf >= 0.65) {
+            try {
+              const updated = await rewardsController.creditFromBin(activeUserId, objClass);
+              if (updated) {
+                const points = objClass === 'dry' ? 5 : 10;
+                console.log(`Credited user ${activeUserId}: ${objClass} (+${points} pts)`);
+                socketService.emitCreditUpdate({ user_id: activeUserId, waste_type: objClass, credits: updated.credits });
+              }
+            } catch (err) {
+              console.error('Auto-credit from bin failed:', err);
+            }
+          }
+        }
       }
     }
   }

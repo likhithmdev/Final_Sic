@@ -82,7 +82,6 @@ class SmartBinSystem:
             dry_pin=GPIOConfig.SERVO_DRY_PIN,
             wet_pin=GPIOConfig.SERVO_WET_PIN,
             electronic_pin=GPIOConfig.SERVO_ELECTRONIC_PIN,
-            unknown_pin=GPIOConfig.SERVO_UNKNOWN_PIN,
         )
         
         self.bin_monitor = MultiBinMonitor(GPIOConfig.get_bin_sensors())
@@ -150,7 +149,7 @@ class SmartBinSystem:
             
             if destination != 'none':
                 logger.info(f"Routing to: {destination}")
-                self.servo.rotate_to_bin(destination)
+                self.servo.route_to_bin(destination)
                 time.sleep(2)  # Allow time for waste to drop
                 self.servo.reset()
             else:

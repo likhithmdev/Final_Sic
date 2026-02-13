@@ -89,10 +89,9 @@ class WasteDetector:
         # Determine destination
         if count == 0:
             destination = "none"
-        elif count == 1:
-            destination = detections[0]['class']
         else:
-            destination = "processing"
+            # Route to the class of the most confident detection
+            destination = max(detections, key=lambda x: x['confidence'])['class']
         
         summary = {
             'count': count,

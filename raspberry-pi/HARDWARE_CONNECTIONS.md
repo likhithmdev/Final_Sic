@@ -4,20 +4,19 @@ All pin numbers below use **BCM** (Broadcom) numbering. Use a Pi pinout diagram 
 
 ---
 
-## 1. Servos (4× – one per bin door)
+## 1. Servos (3× – one per bin door)
 
 | Bin            | Servo wire      | Raspberry Pi        |
 |----------------|-----------------|---------------------|
 | **Dry**        | Signal (Orange) | **GPIO 5**          |
 | **Wet**        | Signal (Orange) | **GPIO 6**          |
 | **Electronic** | Signal (Orange) | **GPIO 12**         |
-| **Unknown**    | Signal (Orange) | **GPIO 13**         |
 
 **All servos (common):**
 - **VCC (Red)**   → 5V (e.g. Pin 2 or 4)
 - **GND (Brown/Black)** → GND (e.g. Pin 6, 9, 14, 20, 25, 30, 34, 39)
 
-Use a **5V supply** that can handle 4 servos; share **GND** with the Pi.
+Use a **5V supply** that can handle 3 servos; share **GND** with the Pi.
 
 ---
 
@@ -31,7 +30,7 @@ Use a **5V supply** that can handle 4 servos; share **GND** with the Pi.
 
 ---
 
-## 3. Ultrasonic sensors (HC-SR04) – 4× bin level
+## 3. Ultrasonic sensors (HC-SR04) – 3× bin level
 
 **Important:** Echo output is **5V**. Pi GPIO is **3.3V**. Use a **voltage divider** (e.g. 1kΩ + 2kΩ) or level shifter on each **Echo** line.
 
@@ -40,7 +39,6 @@ Use a **5V supply** that can handle 4 servos; share **GND** with the Pi.
 | **Dry**        | **23**         | **24**      | 5V  | GND |
 | **Wet**        | **25**         | **8**       | 5V  | GND |
 | **Electronic** | **7**          | **1** *     | 5V  | GND |
-| **Processing** | **20**         | **21**      | 5V  | GND |
 
 \* GPIO 1 is often used for I2C (SDA). If you have I2C devices, use another free GPIO (e.g. 16) for this Echo and update `gpio_setup.py` → `ULTRASONIC_ELECTRONIC`.
 
@@ -75,12 +73,10 @@ Use a **5V supply** that can handle 4 servos; share **GND** with the Pi.
 | Servo Dry        | 5                  |
 | Servo Wet        | 6                  |
 | Servo Electronic | 12                 |
-| Servo Unknown    | 13                 |
 | IR sensor        | 17                 |
 | Ultrasonic Dry   | Trig 23, Echo 24   |
 | Ultrasonic Wet   | Trig 25, Echo 8    |
 | Ultrasonic Electronic | Trig 7, Echo 1 |
-| Ultrasonic Processing | Trig 20, Echo 21 |
 | LED Status       | 26                 |
 | LED Error        | 19                 |
 
@@ -89,7 +85,7 @@ Use a **5V supply** that can handle 4 servos; share **GND** with the Pi.
 ## Power
 
 - **Pi:** 5V 3A USB-C.
-- **Servos:** 5V capable of ~1–2A total (or external 5V with common GND).
+- **Servos:** 5V capable of ~1A total (or external 5V with common GND).
 - **Sensors:** 3.3V or 5V as per module; share GND with Pi.
 
 ---

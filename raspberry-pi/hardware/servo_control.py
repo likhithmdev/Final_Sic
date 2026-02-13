@@ -104,11 +104,10 @@ class ServoController:
 
 class BinServoController:
     """
-    Controls four separate servos, one per bin door:
+    Controls three separate servos, one per bin door:
     - dry
     - wet
     - electronic
-    - unknown / multiple / reject
     """
     
     def __init__(
@@ -116,13 +115,11 @@ class BinServoController:
         dry_pin: int,
         wet_pin: int,
         electronic_pin: int,
-        unknown_pin: int,
         frequency: int = 50,
     ):
         self.dry = ServoController(pin=dry_pin, frequency=frequency)
         self.wet = ServoController(pin=wet_pin, frequency=frequency)
         self.electronic = ServoController(pin=electronic_pin, frequency=frequency)
-        self.unknown = ServoController(pin=unknown_pin, frequency=frequency)
         
         # Simple open/close angles; you can calibrate these per door
         self.closed_angle = 0
@@ -132,7 +129,7 @@ class BinServoController:
         self._close_all()
     
     def _close_all(self):
-        for servo in (self.dry, self.wet, self.electronic, self.unknown):
+        for servo in (self.dry, self.wet, self.electronic):
             try:
                 servo.rotate_to(self.closed_angle)
             except Exception as e:
@@ -143,7 +140,7 @@ class BinServoController:
         Open only the door for the given bin type.
         
         Args:
-            bin_type: 'dry' | 'wet' | 'electronic' | 'reject' | 'processing'
+            bin_type: 'dry' | 'wet' | 'electronic'
         """
         logger.info(f"Routing to bin (multi-servo): {bin_type}")
         # Close all doors
@@ -158,8 +155,9 @@ class BinServoController:
         elif bin_type == 'electronic':
             target = self.electronic
         else:
-            # reject, processing, unknown, multi-object
-            target = self.unknown
+            # Unknown, processing, or other destinations: default to dry
+            logger.warning(f"Unknown bin type '{bin_type}', routing to dry bin")
+            target = self.dry
         
         try:
             target.rotate_to(self.open_angle)
@@ -173,7 +171,7 @@ class BinServoController:
     
     def cleanup(self):
         """Cleanup all servos."""
-        for servo in (self.dry, self.wet, self.electronic, self.unknown):
+        for servo in (self.dry, self.wet, self.electronic):
             try:
                 servo.cleanup()
             except Exception:

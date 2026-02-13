@@ -1,63 +1,97 @@
 # Smart AI Waste Segregation System
 
-Edge AI-powered intelligent waste classification system with real-time monitoring dashboard.
+AI-powered intelligent waste classification system with 3-bin segregation, real-time monitoring, and rewards system.
 
 ## 🎯 Features
 
-- **Real-time Object Detection** using YOLOv8
-- **Multi-object Handling** with processing chamber
-- **Live Dashboard** with Socket.IO updates
-- **Edge AI Processing** on Raspberry Pi
-- **Automated Sorting** with servo control
-- **Fill-level Monitoring** with ultrasonic sensors
-- **🆕 User Authentication** with JWT tokens
-- **🆕 Rewards System** - Earn credits by submitting bottles
-- **🆕 Redemption Store** - Redeem credits for rewards
-- **🆕 Webcam Integration** for bottle verification
+- **Smart 3-Bin Segregation**: Dry, Wet, and E-Waste
+- **Real-time Detection** using TFLite/YOLO/Heuristic models
+- **Face Recognition Check-in** on laptop
+- **Servo-Controlled Lids** for automatic sorting
+- **Fill-level Monitoring** with 3 ultrasonic sensors
+- **User Authentication** with JWT tokens
+- **Rewards System** - Earn points for dry & e-waste
+- **Store & Redemption** - Redeem points for rewards
+- **Live Dashboard** with Socket.IO real-time updates
+- **MQTT Integration** for reliable communication
+
+## 🗑️ Waste Categories (3 Bins)
+
+| Bin | Type | Points |
+|-----|------|--------|
+| 1 | **Dry** (Plastic, Paper, Cardboard) | 5 |
+| 2 | **Wet** (Organic, Food Waste) | 0 |
+| 3 | **E-Waste** (Electronics, Hazardous) | 10 |
 
 ## 🏗 Architecture
 
 ```
-YOLO Detection → MQTT → Node Backend → WebSocket → React Dashboard
-     ↓
-Hardware Control (Servos, Sensors)
+IR Sensor Trigger → Camera Capture → ML Detection → Servo Control
+         ↓
+   MQTT Publishing → Backend Server → Real-time Updates → Dashboard
+         ↓
+   Auto-Credit Rewards → Bin Level Monitoring
 ```
 
 ## 📦 Components
 
-- **raspberry-pi/** - Edge AI detection & hardware control
-- **server/** - Node.js backend with MQTT & WebSocket
-- **client/** - React dashboard with real-time updates
-- **models/** - Trained YOLO weights
-- **dataset/** - Training data
-- **docs/** - Documentation & diagrams
+- **raspberry-pi/** - Edge AI inference & hardware control (main.py)
+- **laptop/** - Face recognition check-in system (face_checkin.py)
+- **server/** - Node.js backend with MQTT, WebSocket, MySQL
+- **client/** - React dashboard with live updates
+- **models/** - TFLite/YOLO model weights
+- **docs/** - Architecture & setup guides
 
 ## 🚀 Quick Start
 
-### Raspberry Pi Setup
+### 1. Raspberry Pi (Hardware & Detection)
 ```bash
 cd raspberry-pi
+python3 -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
 python main.py
 ```
+- Waits for IR sensor trigger
+- Captures image and runs ML detection
+- Controls servos to open correct bin lid
+- Publishes detection & bin status via MQTT
 
-### Server Setup
+### 2. Backend Server (Node.js)
 ```bash
 cd server
 npm install
 npm start
 ```
+- Connects to MQTT broker
+- Receives detections and bin status
+- Auto-credits users for waste disposal
+- Serves API endpoints
 
-### Client Setup
+### 3. Frontend Client (React)
 ```bash
 cd client
 npm install
 npm run dev
 ```
+- Displays real-time dashboard
+- Shows bin fill levels & detection history
+- User login & rewards management
 
-## 📡 Detection Logic
+### 4. Face Check-in (Optional, on Laptop)
+```bash
+cd laptop
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 
-**Single Object** → Direct to bin (plastic/paper/metal/organic)
+# Add training images to faces/{username}/ directories
+# Then run:
+python face_checkin.py
+```
+- Recognizes users automatically
+- Auto-checks them into the system
+- Enables instant point credits
 
 **Multiple Objects** → Processing chamber → Sequential segregation
 

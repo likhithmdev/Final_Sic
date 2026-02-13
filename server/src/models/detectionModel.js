@@ -4,6 +4,7 @@ class Detection {
     this.objects = data.objects || [];
     this.destination = data.destination || 'none';
     this.timestamp = data.timestamp || new Date().toISOString();
+    this.confidence = data.confidence || null;
   }
   
   validate() {
@@ -15,9 +16,10 @@ class Detection {
       throw new Error('Objects must be an array');
     }
     
-    const validDestinations = ['plastic', 'paper', 'metal', 'organic', 'processing', 'none'];
+    // Valid waste destinations: dry, wet, electronic (3 bins) + special cases
+    const validDestinations = ['dry', 'wet', 'electronic', 'none', 'reject', 'multiplewaste'];
     if (!validDestinations.includes(this.destination)) {
-      throw new Error('Invalid destination');
+      throw new Error(`Invalid destination: ${this.destination}. Valid options: ${validDestinations.join(', ')}`);
     }
     
     return true;

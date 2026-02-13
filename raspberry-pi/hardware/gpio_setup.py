@@ -13,20 +13,18 @@ class GPIOConfig:
     """Central GPIO configuration manager"""
     
     # Pin definitions (BCM mode)
-    # Separate servo pins for each bin door
+    # Separate servo pins for each bin door (3 bins)
     SERVO_DRY_PIN = 5
     SERVO_WET_PIN = 6
     SERVO_ELECTRONIC_PIN = 12
-    SERVO_UNKNOWN_PIN = 13
     
     # IR sensor
     IR_SENSOR_PIN = 17
     
-    # Ultrasonic sensors (Trigger, Echo pairs)
+    # Ultrasonic sensors (Trigger, Echo pairs) - 3 bins
     ULTRASONIC_DRY = (23, 24)
     ULTRASONIC_WET = (25, 8)
     ULTRASONIC_ELECTRONIC = (7, 1)
-    ULTRASONIC_PROCESSING = (20, 21)
     
     # LED indicators (optional)
     LED_STATUS = 26
@@ -64,7 +62,6 @@ class GPIOConfig:
             'dry': (*GPIOConfig.ULTRASONIC_DRY, 30.0),
             'wet': (*GPIOConfig.ULTRASONIC_WET, 30.0),
             'electronic': (*GPIOConfig.ULTRASONIC_ELECTRONIC, 30.0),
-            'processing': (*GPIOConfig.ULTRASONIC_PROCESSING, 30.0)
         }
     
     @staticmethod
